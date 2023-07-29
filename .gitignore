@@ -1,0 +1,40 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node.js
+node_modules/
+
+# Build files
+dist/
+build/
+out/
+
+# Dependency directories
+bower_components/
+jspm_packages/
+
+# IDE files
+.idea/
+.vscode/
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Compiled output
+*.min.css
+*.min.js
+*.min.html
+*.min.map
+
+# Other generated files
+*.bak
+*.tmp
+
+# Development environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
