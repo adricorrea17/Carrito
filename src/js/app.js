@@ -12,7 +12,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
         .then(json => {
             for (let thisProduct of json) {
                 let currentPoduct = new Product(thisProduct, theCart);
-
+                
                 PRODUCTS.append(currentPoduct.element);
             }
         });
