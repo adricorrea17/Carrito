@@ -1,8 +1,13 @@
 export class Product {
     constructor(props,cart) {
       this.props = props;
-      this.element = this.createElement();
       this.Cart = cart;
+      this.colors =  [
+        { color: 'Silver', hex: '#d2d3d4' },
+        { color: 'Red', hex: 'red' },
+        { color: 'Blue', hex: 'blue' }
+      ];      
+      console.dir(this.colors)
       this.styles = `
         <style>
           .Product input + label {
@@ -17,10 +22,26 @@ export class Product {
         </style>
       `;
 
+      this.element = this.createElement();
       document.head.insertAdjacentHTML('beforeend', this.styles);
     }
 
     template() {
+      let templateColors = '';
+
+      for(let i in this.colors){
+        templateColors += `<div>
+
+          <input type="radio" ${ (i==0) ? 'checked' : '' } name="color" value="${ i }" id="Color${ i }${this.props.id}" class="sr-only" />
+
+          <label
+            for="Color${ i }${this.props.id}"
+            class="block h-4 w-4 cursor-pointer rounded-full bg-[${ this.colors[i].hex }] transition"
+          >
+            <span class="sr-only"> ${ this.colors[i].color } </span>
+          </label>
+        </div>`;
+      }
       let html = `
           <form class="group relative block overflow-hidden Product">
               <button type="button" class="absolute end-4 top-4 z-10 rounded-full bg-white p-1.5 text-gray-900 transition hover:text-gray-900/75">
@@ -45,60 +66,8 @@ export class Product {
                       <div
                         class="flex flex-wrap justify-center gap-1 [&:hover_label]:opacity-75"
                       >
-                        <div>
-                          <input type="radio" checked name="color" value="Gray" id="ColorSg${this.props.id}" class="sr-only" />
-              
-                          <label
-                            for="ColorSg${this.props.id}"
-                            class="block h-4 w-4 cursor-pointer rounded-full bg-[#595759] transition"
-                          >
-                            <span class="sr-only"> Space Gray </span>
-                          </label>
-                        </div>
-              
-                        <div>
-                          <input type="radio" name="color" value="Silver" id="ColorS${this.props.id}" class="sr-only" />
-              
-                          <label
-                            for="ColorS${this.props.id}"
-                            class="block h-4 w-4 cursor-pointer rounded-full bg-[#d2d3d4] transition"
-                          >
-                            <span class="sr-only"> Silver </span>
-                          </label>
-                        </div>
-              
-                        <div>
-                          <input type="radio" name="color" value="Pink" id="ColorP${this.props.id}" class="sr-only" />
-              
-                          <label
-                            for="ColorP${this.props.id}"
-                            class="block h-4 w-4 cursor-pointer rounded-full bg-[#d89f97] transition"
-                          >
-                            <span class="sr-only"> Pink </span>
-                          </label>
-                        </div>
-              
-                        <div>
-                          <input type="radio" name="color" value="Green" id="ColorG${this.props.id}" class="sr-only" />
-              
-                          <label
-                            for="ColorG${this.props.id}"
-                            class="block h-4 w-4 cursor-pointer rounded-full bg-[#afbfab] transition"
-                          >
-                            <span class="sr-only"> Green </span>
-                          </label>
-                        </div>
-              
-                        <div>
-                          <input type="radio" name="color" value="Blue" id="ColorSb${this.props.id}" class="sr-only" />
-              
-                          <label
-                            for="ColorSb${this.props.id}"
-                            class="block h-4 w-4 cursor-pointer rounded-full bg-[#91a5bb] transition "
-                          >
-                            <span class="sr-only"> Blue </span>
-                          </label>
-                        </div>
+                      ${ templateColors }
+                        
                       </div>
                     </div>
                     <div class="sizes flex gap-2">
@@ -148,15 +117,11 @@ export class Product {
     createElement() {
       let DIV = document.createElement('div');
       DIV.innerHTML = this.template();
+
   
       let BTNTOADDCART = DIV.querySelector('.addItemToCart');
   
       BTNTOADDCART.addEventListener('click', () => {
-
-            let color = DIV.querySelector('input[name="color"]:checked').value
-            let size = DIV.querySelector('input[name="size"]:checked').value
-            console.dir(color)
-            console.dir(size)
 
         this.Cart.pushItem( this );
       });
@@ -164,4 +129,26 @@ export class Product {
       return DIV;
     }
 
+    getSize(){
+      return this.element.querySelector('input[name="size"]:checked').value
+    }
+
+    getColor(){
+      return this.element.querySelector('input[name="color"]:checked').value
+    }
+
+    getSKU(){
+      let size = this.getSize();
+      let color = this.getColor();  
+
+      let sku = this.props.id.toString();
+      if(size){
+          sku += '-' + this.getSize();
+      }
+      if(color){
+        sku += '-' + this.getColor();
+      }
+
+      return sku;
+    }
 }
