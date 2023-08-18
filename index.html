@@ -5,15 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="src/input.css">
 </head>
 
 <body>
 
+    <div id="btnCart" class="absolute top-4 left-4 z-50 text-white bg-gray-700 p-2 flex items-center hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </svg>
+        <div class="cart-items font-bold ml-2 mr-2">0</div> productos
+    </div>
+
     <div class="flex">
         <!-- Start Carrito -->
-        <div class="relative w-screen max-w-sm border border-gray-600 bg-gray-100 px-4 py-8 sm:px-6 lg:px-8 col-5"
+
+
+        <div id="sideBar" class="transition-all relative w-screen max-w-sm border border-gray-600 bg-gray-100 px-4 py-8 sm:px-6 lg:px-8 col-5"
             aria-modal="true" role="dialog" tabindex="-1">
-            <button class="absolute end-4 top-4 text-gray-600 transition hover:scale-110">
+            <button class="absolute end-4 top-4 text-gray-600 transition hover:scale-110 toggleCart">
                 <span class="sr-only">Close cart</span>
 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -28,23 +38,16 @@
                 </ul>
 
                 <div class="space-y-4 text-center">
-                    <a href="#"
-                        class="block rounded border border-gray-600 px-5 py-3 text-sm text-gray-600 transition hover:ring-1 hover:ring-gray-400">
-                        View my cart (2)
-                    </a>
 
                     <a href="#"
-                        class="block rounded bg-gray-700 px-5 py-3 text-sm text-gray-100 transition hover:bg-gray-600">
-                        Checkout
+                        class="block rounded bg-gray-700 px-5 py-3 text-sm text-gray-100 transition hover:bg-gray-600 checkoutModal">
+                        Checkout <span class="cart-items">(0)</span>
                     </a>
 
-                    <a href="#"
-                        class="inline-block text-sm text-gray-500 underline underline-offset-4 transition hover:text-gray-600">
-                        Continue shopping
-                    </a>
                 </div>
             </div>
         </div>
+        <div class="modal"></div>
         <!-- End carrito -->
 
         <!-- Lista de productos -->
@@ -55,5 +58,6 @@
 </body>
 
 <script src="src/js/app.js" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </html>

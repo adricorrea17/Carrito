@@ -22,8 +22,8 @@ export class Cart {
                 <div>
     
                 <div class="flex">
-                    <div class="block h-4 w-4 mb-2 cursor-pointer rounded-full bg-[${ item.product.colors[ item.product.getColor() ].hex }]">
-                    <span class="sr-only"> ${ item.product.colors[ item.product.getColor() ].color } </span>
+                    <div class="block h-4 w-4 mb-2 cursor-pointer rounded-full bg-[${item.product.colors[item.product.getColor()].hex}]">
+                    <span class="sr-only"> ${item.product.colors[item.product.getColor()].color} </span>
                     </div>
                 </div>
                 <div>
@@ -48,21 +48,23 @@ export class Cart {
             let item = {
                 sku: sku,
                 quantity: 1,
-                product: product
+                product: product,
+                color: product.colors[ product.getColor() ],
+                size: product.getSize()
             };
-
+            
 
             this.items[sku] = item;
             this.createElementItemCart(this.items[sku])
 
-
+            this.updateTotalsInView();
             return item;
         } else {
             let quantity = searchItem.quantity + 1;
             this.changeItemQuantity(sku, quantity);
 
             let INPUTQUANTITY = this.items[sku].element.querySelector('.inputQuantity');
-                INPUTQUANTITY.value = parseInt(quantity);
+            INPUTQUANTITY.value = parseInt(quantity);
 
             return searchItem;
         }
@@ -72,8 +74,22 @@ export class Cart {
     }
     removeItemFromCart(sku) {
         this.items[sku].element.remove();
+        delete this.items[sku];
+        this.updateTotalsInView();
+    }
+    updateTotalsInView() {
+        let count_of_items = 0;
 
-        return delete this.items[sku];
+        for (let i in this.items) { count_of_items++; }
+
+        console.dir(this.items);
+        console.dir(count_of_items);
+
+        let DIVS_CART_ITEMS = document.querySelectorAll('.cart-items');
+
+        DIVS_CART_ITEMS.forEach(function (item) {
+            item.innerHTML = count_of_items
+        });
     }
     changeItemQuantity(sku, quantity) {
         this.items[sku].quantity = quantity
@@ -83,18 +99,74 @@ export class Cart {
         let sku = item.sku;
 
         let DIV = document.createElement('div');
-            DIV.innerHTML = this.itemTemplate(item);
+        DIV.innerHTML = this.itemTemplate(item);
 
         let BTNTOREMOVECART = DIV.querySelector('.removeItemFromCart');
-            BTNTOREMOVECART.addEventListener('click', () => this.removeItemFromCart(sku) );
-        
+        BTNTOREMOVECART.addEventListener('click', () => this.removeItemFromCart(sku));
+
         let INPUTQUANTITY = DIV.querySelector('.inputQuantity');
-            INPUTQUANTITY.addEventListener('change', function() {
-                item.quantity = parseInt(this.value);
-            });
+        INPUTQUANTITY.addEventListener('change', function () {
+            item.quantity = parseInt(this.value);
+        });
 
         this.CARTLIST.append(DIV)
         item.element = DIV;
         return this.items[sku];
+    }
+    modalCheckout() {
+        const { value: formValues } = Swal.fire({
+            title: 'Multiple inputs',
+            html:
+                'Nombre <input id="swal-input1" class="swal2-input">' +
+                'Apellido <input id="swal-input2" class="swal2-input">' +
+                'Email <input id="swal-input3" class="swal2-input">',
+            focusConfirm: false,
+        }).then((result) => {
+
+            let firstname = document.getElementById('swal-input1').value;
+            let lastname = document.getElementById('swal-input2').value;
+            let email = document.getElementById('swal-input3').value;
+
+            let message = `
+                <b>Nombre:</b> ${firstname} <br>
+                <b>Apellido:</b> ${lastname} <br>
+                <b>Email:</b> ${email}
+
+                <p>
+                <b>Items:</b>
+                <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Precio</th>
+                    <th>Color</th>
+                    <th>Tamano</th>
+                </tr>`;
+
+            for (let i in this.items) {
+                let props = this.items[i].product.props
+                let item = this.items[i]
+                console.dir(item)
+                message += `<tr>
+                    <td>${props.id}</td>
+                    <td>${props.title}</td>
+                    <td>${props.price}</td>
+                    <td>${item.color.color}</td>
+                    <td>${item.size}</td>
+                  </tr>`;
+
+            }
+
+            message += `</table>`;
+
+            Swal.fire({
+                title: 'Genial',
+                width: '80%',
+                html: 'Se envió el siguiente pedido: <br>' + message,
+                icon: 'success'
+            });
+        })
+
+
     }
 }
