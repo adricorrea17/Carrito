@@ -6,6 +6,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
     const CARTLIST = document.getElementById('CartList');
 
     const theCart = new Cart(CARTLIST);
+
+    window.theCart = theCart;
     
     fetch('https://fakestoreapi.com/products')
         .then(res => res.json())
@@ -51,32 +53,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
     
 
     checkoutModal.addEventListener('click', () => {
-        theCart.modalCheckout()
-
-    //     modal.innerHTML = `<div>
-    //             <a href="#close" title="Close" class="close">X</a>
-                
-    //             <form id="registrationForm">
-    //                 <label for="name">Nombre:</label>
-    //                 <input type="text" id="name" name="name" required><br><br>
-
-    //                 <label for="email">Correo Electrónico:</label>
-    //                 <input type="email" id="email" name="email" required><br><br>
-
-    //                 <label for="password">Contraseña:</label>
-    //                 <input type="password" id="password" name="password" required><br><br>
-
-    //                 <label for="creditCard">Número de Tarjeta de Crédito:</label>
-    //                 <input type="text" id="creditCard" name="creditCard" required><br><br>
-
-    //                 <label for="cvu">CVU:</label>
-    //                 <input type="text" id="cvu" name="cvu" required><br><br>
-
-    //                 <button type="submit">Registrarse</button>
-    //             </form>
-
-    //         </div>`
-            
+        theCart.modalCheckout();            
     })
 
 

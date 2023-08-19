@@ -7,7 +7,7 @@ export class Product {
         { color: 'Red', hex: 'red' },
         { color: 'Blue', hex: 'blue' }
       ];      
-      console.dir(this.colors)
+      
       this.styles = `
         <style>
           .Product input + label {

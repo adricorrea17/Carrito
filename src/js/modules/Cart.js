@@ -1,7 +1,13 @@
 export class Cart {
     constructor(CARTLIST) {
         this.items = [];
+        this.subtotal = 0;
+        this.discounts = 0;
+        this.iva = 0;
         this.total = 0;
+        this.totalDescounted = 0;
+        this.tax = 0.21;
+        this.count_of_items = 0;
         this.CARTLIST = CARTLIST;
     }
     itemTemplate(item) {
@@ -38,8 +44,6 @@ export class Cart {
         </li>`;
         return html;
     }
-
-
     pushItem(product) {
         let sku = product.getSKU();
         let searchItem = this.serchItemInCart(sku);
@@ -57,7 +61,7 @@ export class Cart {
             this.items[sku] = item;
             this.createElementItemCart(this.items[sku])
 
-            this.updateTotalsInView();
+            this.updateTotal();
             return item;
         } else {
             let quantity = searchItem.quantity + 1;
@@ -65,9 +69,19 @@ export class Cart {
 
             let INPUTQUANTITY = this.items[sku].element.querySelector('.inputQuantity');
             INPUTQUANTITY.value = parseInt(quantity);
-
+            
+            this.updateTotal();
             return searchItem;
         }
+    }
+    changeDiscount(discount = 0){
+        if(discount > 100) {
+            return 0;
+        }
+        this.discounts = discount;
+        this.updateTotal();
+        
+        return 1;
     }
     serchItemInCart(sku) {
         return this.items[sku];
@@ -75,21 +89,81 @@ export class Cart {
     removeItemFromCart(sku) {
         this.items[sku].element.remove();
         delete this.items[sku];
+        this.updateTotal();
+    }
+    priceToHuman(price) {
+        var roundedPrice = price.toFixed(2);
+        return "$" + roundedPrice;
+    }
+    updateTotal() {
+        let count_of_items = 0;
+        let subtotal = 0;
+
+        // recorremos items para contabilizar
+        for (let i in this.items) {
+            count_of_items++; 
+            subtotal += this.items[i].product.props.price * this.items[i].quantity;
+        }
+
+        this.count_of_items = count_of_items;
+
+        this.subtotal = subtotal;
+        
+        this.totalDescounted = this.discounts / 100 * this.subtotal;
+        subtotal = subtotal -this.totalDescounted;
+
+        this.iva = subtotal * this.tax;
+        this.total = subtotal + this.iva;
+        
+
+
         this.updateTotalsInView();
+
     }
     updateTotalsInView() {
-        let count_of_items = 0;
-
-        for (let i in this.items) { count_of_items++; }
-
-        console.dir(this.items);
-        console.dir(count_of_items);
-
+        // cambiamos los valores en el document
         let DIVS_CART_ITEMS = document.querySelectorAll('.cart-items');
+        let DIVS_CART_TOTAL = document.querySelectorAll('.cartTotals');
+        let _this = this;
 
-        DIVS_CART_ITEMS.forEach(function (item) {
-            item.innerHTML = count_of_items
+        let templateTotals = ` 
+            <dl class="space-y-0.5 text-sm text-gray-700">
+                <div class="flex justify-between">
+                <dt>Subtotal</dt>
+                <dd>${this.priceToHuman(this.subtotal)}</dd>
+                </div>
+                `;
+                
+            if( this.discounts ){
+                templateTotals +=`
+                <div class="flex justify-between">
+                <dt>Descuentos</dt>
+                <dd>${this.discounts}% (${this.priceToHuman(this.totalDescounted)})</dd>
+                </div>`;
+            }
+        templateTotals += `
+                <div class="flex justify-between">
+                <dt>IVA</dt>
+                <dd>${this.priceToHuman(this.iva)}</dd>
+                </div>
+
+
+                <div class="flex justify-between !text-base font-medium">
+                <dt>Total</dt>
+                <dd>${this.priceToHuman(this.total)}</dd>
+                </div>
+            </dl>`;
+        
+        DIVS_CART_TOTAL.forEach(function (div) {
+            div.innerHTML = templateTotals
         });
+    
+    
+        DIVS_CART_ITEMS.forEach(function (div) {
+            div.innerHTML = _this.count_of_items
+        });
+    
+        
     }
     changeItemQuantity(sku, quantity) {
         this.items[sku].quantity = quantity
@@ -97,6 +171,7 @@ export class Cart {
     }
     createElementItemCart(item) {
         let sku = item.sku;
+        let _this = this;
 
         let DIV = document.createElement('div');
         DIV.innerHTML = this.itemTemplate(item);
@@ -107,6 +182,7 @@ export class Cart {
         let INPUTQUANTITY = DIV.querySelector('.inputQuantity');
         INPUTQUANTITY.addEventListener('change', function () {
             item.quantity = parseInt(this.value);
+            _this.updateTotal();
         });
 
         this.CARTLIST.append(DIV)
@@ -138,9 +214,9 @@ export class Cart {
                 <tr>
                     <th>ID</th>
                     <th>Título</th>
-                    <th>Precio</th>
                     <th>Color</th>
-                    <th>Tamano</th>
+                    <th>Tamaño</th>
+                    <th>Precio</th>
                 </tr>`;
 
             for (let i in this.items) {
@@ -150,9 +226,9 @@ export class Cart {
                 message += `<tr>
                     <td>${props.id}</td>
                     <td>${props.title}</td>
-                    <td>${props.price}</td>
                     <td>${item.color.color}</td>
                     <td>${item.size}</td>
+                    <td>${props.price}</td>
                   </tr>`;
 
             }
